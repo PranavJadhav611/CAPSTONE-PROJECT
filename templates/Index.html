@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Video Classification</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+</head>
+<style>
+	.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.p {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.container-name div { 
+    display: inline-block; 
+	width: 500px; 
+	min-height: 50px; 
+	background-color: #eee; 
+	height: auto; 
+  } 
+</style>
+<body>
+
+	<div class="container">
+		<h1 class="jumbotron bg-primary">Video Classfication</h1>
+		<br><br>
+		<form class="form-horizontal" action="/submit" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+				<label class="control-label col-sm-2" for="pwd">Upload Your Image :</label>
+					<div class="col-sm-10">          
+						<input type="file" class="form-control" placeholder="Hours Studied"  name="my_image" id="pwd">
+					</div>
+			</div>
+
+			<div class="form-group">        
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-success">Submit</button>
+				</div>
+			</div>
+
+		
+
+		<div>
+			<input id="valR" type="range" min="0" max={{count}} value="0" step="1" oninput="showVal(this.value)" onchange="showVal(this.value)" />
+			<img id="img" src="{{ url_for('static', filename='frame/0.jpg') }}" width="1000" height="600" class="center"/>
+			<pre id="text" style="color: #000000; font-family: Arial, Helvetica, sans-serif; font-size: large; width: 1000; text-align: center;">Null</pre>
+			<div class="container-name"> 
+				<div class="div1"><pre id="pred" class="pre" style="color: #000000; font-family: Arial, Helvetica, sans-serif; font-size: large; width: 450; text-align: center;" >0</pre></div> 
+				<div class="div2"><pre id="audio_pred" class="pre" style="color: #000000; font-family: Arial, Helvetica, sans-serif; font-size: large; width: 450; text-align: center;">0</pre></div> 
+			</div> 
+			
+		</div>
+		<script>
+			var pred_arr = [ 
+								{% for pred in pred_array %}	
+								"{{ pred }}",
+								{% endfor %}
+							];
+			var aud_text = [ 
+								{% for x in audio_text %}	
+								"{{ x }}",
+								{% endfor %}
+							];
+			var pred_audio_arr = [ 
+								{% for pred in pred_audio_array %}	
+								"{{ pred }}",
+								{% endfor %}
+							];
+			var val = document.getElementById("valR").value;
+			//document.getElementById("range").innerHTML=val;
+			document.getElementById("img").src ="{{ url_for('static', filename='frame/')}}" +val + ".jpg";
+			document.getElementById("pred").innerHTML= pred_arr[val];
+			document.getElementById("audio_pred").innerHTML= pred_audio_arr[val];
+			document.getElementById("text").innerHTML= aud_text[val];
+			function showVal(newVal)
+			{
+				  //document.getElementById("range").innerHTML=newVal;
+				  document.getElementById("img").src ="{{ url_for('static', filename='frame/')}}" +newVal+ ".jpg";
+				document.getElementById("pred").innerHTML= pred_arr[newVal];
+				document.getElementById("audio_pred").innerHTML= pred_audio_arr[newVal];
+				document.getElementById("text").innerHTML= aud_text[newVal];
+			}
+		</script>
+			<canvas id="chart" width="500" height="400" style="align-items: left;"></canvas>
+
+			<script>
+				// bar chart data
+				var barData = {
+				  labels : [
+					 {% for item in labels1 %}	
+					 "{{ item }}",
+					{% endfor %}
+			  		],
+		  
+				  datasets : [{
+					fillColor: "rgba(151,187,205,0.2)",
+					strokeColor: "rgba(151,187,205,1)",
+					pointColor: "rgba(151,187,205,1)",
+					data : [
+					  	{% for item in values1 %}
+						 	"{{ item }}",
+						{% endfor %}
+				 		]
+					}
+				  ]
+				}
+		  
+			   // get bar chart canvas
+			   var mychart = document.getElementById("chart").getContext("2d");
+		  
+				 steps = 10
+				 max = {{max}}
+		  
+			   // draw bar chart
+			   new Chart(mychart).Bar(barData, {
+				 scaleOverride: true,
+				 scaleSteps: steps,
+				 scaleStepWidth: Math.ceil(max / steps),
+				 scaleStartValue: 0,
+				 scaleShowVerticalLines: true,
+				 scaleShowGridLines : true,
+				 barShowStroke : true,
+				 scaleShowLabels: true
+				 }
+			   );
+			
+			
+			   
+			  </script>
+
+			  <canvas id="chart2" width="500" height="400" style="align-items: right;"></canvas>
+  
+			  <script>
+				  // bar chart data
+				  var barData = {
+					labels : [
+					   {% for item in labels2 %}	
+					   "{{ item }}",
+					  {% endfor %}
+						],
+			
+					datasets : [{
+					  fillColor: "rgba(151,187,205,0.2)",
+					  strokeColor: "rgba(151,187,205,1)",
+					  pointColor: "rgba(151,187,205,1)",
+					  data : [
+							{% for item in values2 %}
+							   "{{ item }}",
+						  {% endfor %}
+						   ]
+					  }
+					]
+				  }
+			
+				 // get bar chart canvas
+				 var mychart = document.getElementById("chart2").getContext("2d");
+			
+				   steps = 10
+				   max = {{max}}
+			
+				 // draw bar chart
+				 new Chart(mychart).Bar(barData, {
+				   scaleOverride: true,
+				   scaleSteps: steps,
+				   scaleStepWidth: Math.ceil(max / steps),
+				   scaleStartValue: 0,
+				   scaleShowVerticalLines: true,
+				   scaleShowGridLines : true,
+				   barShowStroke : true,
+				   scaleShowLabels: true
+				   }
+				 );
+			  
+			  
+				 
+				</script>
+			
+		
+	</form>
+	</div>
+	
+</body>
+</html>
