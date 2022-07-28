@@ -22,6 +22,7 @@ We are students from St. Clair College, Group 6, we have undertaken project from
 - Webpage displays two bar charts and the predictions of the video and audio predictions made by the API.
 
 ## How to run the project
+- Before running the Model API.py change the path for load_model function to the path where you have save the pretrained models.
 - Running the Model_API.py will load all the models and run all the functions.
 - After successfully running the Model_API.py file, index.html will be loaded on the localhost.
 - Once we open the localhost link, we will be asked to upload the video, once we upload the video, the video will be send to the API for predicting its output.
